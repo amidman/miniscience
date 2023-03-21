@@ -19,6 +19,7 @@ class CalcMesh:
 
         # Тут может быть скорость, но сейчас здесь нули
         self.velocity = np.zeros(shape=(3, int(len(nodes_coords) / 3)), dtype=np.double)
+        self.velocity[2] = np.power(self.nodes[0] - self.nodes[1], 2)
 
         # Пройдём по элементам в модели gmsh
         self.tetrs = np.array([tetrs_points[0::4],tetrs_points[1::4],tetrs_points[2::4],tetrs_points[3::4]])
@@ -73,7 +74,7 @@ class CalcMesh:
         # Создаём снапшот в файле с заданным именем
         writer = vtk.vtkXMLUnstructuredGridWriter()
         writer.SetInputDataObject(unstructuredGrid)
-        writer.SetFileName("tetr3d-step-" + str(snap_number) + ".vtu")
+        writer.SetFileName("CS.V.T1-step-" + str(snap_number) + ".vtu")
         writer.Write()
 
 
@@ -85,7 +86,7 @@ gmsh.initialize()
 # Считаем STL
 try:
     path = os.path.dirname(os.path.abspath(__file__))
-    gmsh.merge(os.path.join(path, 't13_data.stl'))
+    gmsh.merge(os.path.join(path, 'CS.V.T1.stl'))
 except:
     print("Could not load STL mesh: bye!")
     gmsh.finalize()
@@ -144,5 +145,11 @@ assert(len(tetrsNodesTags) % 4 == 0)
 
 mesh = CalcMesh(nodesCoord, tetrsNodesTags)
 mesh.snapshot(0)
+
+tau = 0.0001
+
+for i in range(1, 100):
+    mesh.move(tau)
+    mesh.snapshot(i)
 
 gmsh.finalize()

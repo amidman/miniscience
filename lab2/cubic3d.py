@@ -15,6 +15,7 @@ class CalcMesh:
 
         # Профиль скорости (но в данном случае сплошные нули)
         self.velocity = np.zeros(shape=(3, size, size, size), dtype=np.double)
+        self.velocity[2] = np.power(self.nodes[0] - self.nodes[1], 2)
 
     # Метод отвечает за выполнение для всей сетки шага по времени величиной tau
     def move(self, tau):
